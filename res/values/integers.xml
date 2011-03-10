@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="integer" format="integer" name="default_hour">7</item>
+    <item type="integer" format="integer" name="default_minutes">0</item>
+</resources>

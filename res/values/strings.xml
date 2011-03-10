@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Song Alarm</string>
+    <string name="pref_title_alarm_enabled">Turn alarm on</string>
+    <string name="pref_title_alarm_time">Time</string>
+    <string name="pref_summary_default">Press here to select</string>
+    <string name="date_format_alarm_time">h:mm aa</string>
+    <string name="error_no_alarm_set">Cannot turn on alarm: set the time!</string>
+</resources>
