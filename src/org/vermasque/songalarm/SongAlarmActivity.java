@@ -2,9 +2,13 @@ package org.vermasque.songalarm;
 
 import java.util.Calendar;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -20,11 +24,14 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	
 	private Preference mAlarmTimePref, mAlarmEnabledPref;
 
-	private long alarmTimestamp;
+	private long alarmTimestamp;	
+	
+	private PendingIntent lastAlarmIntent;
 	
 	public SongAlarmActivity()
 	{
-		alarmTimestamp = NO_ALARM_TIME_SET;
+		alarmTimestamp  = NO_ALARM_TIME_SET;
+		lastAlarmIntent = null;
 	}
 	
 	@Override
@@ -120,11 +127,34 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 						getResources().getString(R.string.info_alarm_enabled), 
 						Toast.LENGTH_SHORT
 					).show();
-					allowChange = true;				
+					
+					allowChange = true;
+					
+					Intent innerIntent = new Intent(
+						android.content.Intent.ACTION_VIEW, 
+						Uri.parse("http://www.google.com"));
+					
+					// required by PendingIntent.getActivity
+					innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					
+					lastAlarmIntent = 
+						PendingIntent.getActivity(
+							this, 
+							0, 
+							innerIntent, 
+							PendingIntent.FLAG_UPDATE_CURRENT);
+					
+					getAlarmManager().setRepeating(
+						AlarmManager.RTC_WAKEUP, 
+						alarmTimestamp, 
+						AlarmManager.INTERVAL_DAY, 
+						lastAlarmIntent);
 				}
 			} 
 			else
-			{	
+			{
+				getAlarmManager().cancel(lastAlarmIntent);
+				
 				allowChange = true;
 				alarmTimestamp = NO_ALARM_TIME_SET;
 			}
@@ -132,6 +162,9 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		
 		return allowChange;
 	}
-	
-	
+
+	private AlarmManager getAlarmManager()
+	{
+		return (AlarmManager)getSystemService(ALARM_SERVICE);
+	}
 }
