@@ -100,8 +100,10 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		boolean allowChange = false;
 		
 		if (mAlarmEnabledPref == pref)
-		{	
-			if (((Boolean)newValue).booleanValue()) 
+		{
+			boolean enableAlarm = ((Boolean)newValue).booleanValue();
+			
+			if (enableAlarm) 
 			{
 				if (NO_ALARM_TIME_SET == alarmTimestamp) 
 				{
@@ -113,11 +115,16 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				}
 				else
 				{		
+					Toast.makeText(
+						this, 
+						getResources().getString(R.string.info_alarm_enabled), 
+						Toast.LENGTH_SHORT
+					).show();
 					allowChange = true;				
 				}
 			} 
 			else
-			{
+			{	
 				allowChange = true;
 				alarmTimestamp = NO_ALARM_TIME_SET;
 			}
