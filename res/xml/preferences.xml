@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/app_name">
-    <CheckBoxPreference android:defaultValue="false" android:key="alarm_enabled" android:persistent="true" android:title="@string/pref_title_alarm_enabled"></CheckBoxPreference>
-    <Preference android:title="@string/pref_title_alarm_time" android:key="alarm_time" android:persistent="true" android:summary="@string/pref_summary_default"></Preference>
+    <CheckBoxPreference android:defaultValue="false" android:key="alarm_enabled" android:title="@string/pref_title_alarm_enabled" android:persistent="false"></CheckBoxPreference>
+    <Preference android:title="@string/pref_title_alarm_time" android:key="alarm_time" android:summary="@string/pref_summary_default" android:persistent="false"></Preference>
 </PreferenceScreen>
