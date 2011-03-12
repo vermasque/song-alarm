@@ -8,13 +8,17 @@ import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.provider.BaseColumns;
+import android.provider.MediaStore.Audio;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -94,12 +98,54 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			switch (requestCode)
 			{
 			case RESULT_ID_SONG:
-				mSongPref.setSummary(resultIntent.getData().toString());
+				Uri songUri = resultIntent.getData();
+								
+				// assume external storage because audio files are not tied
+				// to a specific application and should be world-readable and exportable
+				Uri contentUri = Audio.Media.EXTERNAL_CONTENT_URI;
+								
+				String[] columns = {
+					Audio.AudioColumns.ARTIST,   Audio.AudioColumns.ALBUM, 
+					Audio.AudioColumns.DURATION, Audio.AudioColumns.TITLE
+				};
+				
+				String whereClause = BaseColumns._ID + "=?";
+				
+				String[] selectArgs = {songUri.getLastPathSegment()}; //{"LIMIT 1"}; ?
+				
+				Cursor cursor = managedQuery(contentUri, columns, whereClause, selectArgs, null);
+							
+				if (cursor.moveToFirst()) {
+					
+					String artist, album, title;
+					long duration;
+					
+					try {
+						artist = getColumnStringValue(cursor, Audio.AudioColumns.ARTIST);
+						album  = getColumnStringValue(cursor, Audio.AudioColumns.ALBUM);
+						title  = getColumnStringValue(cursor, Audio.AudioColumns.TITLE);
+					
+						duration = cursor.getLong(cursor.getColumnIndexOrThrow(Audio.AudioColumns.DURATION));
+					
+						// TODO make this output more user-friendly
+					
+						mSongPref.setSummary(artist + ", " + album + ", " + title + ", " + duration);	
+					}
+					catch(IllegalArgumentException e) {
+						Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+					}
+				}
+				
 				break;
 			default:
 				break;
 			}
 		}
+	}
+
+	private String getColumnStringValue(Cursor cursor, String columnName)
+	{
+		return cursor.getString(cursor.getColumnIndexOrThrow(columnName));
 	}
 
 	@Override
