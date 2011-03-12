@@ -18,7 +18,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.Audio;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -35,11 +34,14 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	private PendingIntent lastAlarmIntent;
 
 	private Preference mSongPref;
+
+	private Uri songUri;
 	
 	public SongAlarmActivity()
 	{
 		alarmTimestamp  = NO_ALARM_TIME_SET;
 		lastAlarmIntent = null;
+		songUri         = null;
 	}
 	
 	@Override
@@ -98,7 +100,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			switch (requestCode)
 			{
 			case RESULT_ID_SONG:
-				Uri songUri = resultIntent.getData();
+				songUri = resultIntent.getData();
 								
 				// assume external storage because audio files are not tied
 				// to a specific application and should be world-readable and exportable
@@ -190,13 +192,13 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			
 			if (enableAlarm) 
 			{
-				if (NO_ALARM_TIME_SET == alarmTimestamp) 
+				if (NO_ALARM_TIME_SET == alarmTimestamp)
 				{
-					Toast.makeText(
-						this, 
-						getResources().getString(R.string.error_no_alarm_set), 
-						Toast.LENGTH_SHORT
-					).show();
+					showToast(R.string.error_no_time_set);
+				} 
+				else if (null == songUri) 
+				{
+					showToast(R.string.error_no_song_set);
 				}
 				else
 				{		
@@ -210,7 +212,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 					
 					Intent innerIntent = new Intent(
 						android.content.Intent.ACTION_VIEW, 
-						Uri.parse("http://www.google.com"));
+						songUri);
 					
 					// required by PendingIntent.getActivity
 					innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -233,12 +235,22 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			{
 				getAlarmManager().cancel(lastAlarmIntent);
 				
-				allowChange = true;
+				allowChange    = true;
+				songUri        = null;
 				alarmTimestamp = NO_ALARM_TIME_SET;
 			}
 		}
 		
 		return allowChange;
+	}
+
+	private void showToast(int messageResourceId)
+	{
+		Toast.makeText(
+			this, 
+			getResources().getString(messageResourceId), 
+			Toast.LENGTH_SHORT
+		).show();
 	}
 
 	private AlarmManager getAlarmManager()
