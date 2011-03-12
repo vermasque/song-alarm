@@ -79,7 +79,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			return true;
 		}
 		else if (pref == mSongPref) {
-			Intent innerIntent = new Intent(android.content.Intent.ACTION_GET_CONTENT);
+			Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT);
 			
 			innerIntent.setType("audio/*");
 			innerIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -129,9 +129,15 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 					
 						duration = cursor.getLong(cursor.getColumnIndexOrThrow(Audio.AudioColumns.DURATION));
 					
-						// TODO make this output more user-friendly
-					
-						mSongPref.setSummary(artist + ", " + album + ", " + title + ", " + duration);	
+						StringBuilder builder = new StringBuilder();
+				
+						builder.append(title).append('\n');
+						builder.append(artist).append('\n');
+						builder.append(album).append('\n');
+						
+						addMinSecString(builder, duration);	
+						
+						mSongPref.setSummary(builder.toString());
 					}
 					catch(IllegalArgumentException e) {
 						Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
@@ -143,6 +149,14 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				break;
 			}
 		}
+	}
+
+	private void addMinSecString(StringBuilder builder, long durationMillis)
+	{		
+		long minutes = durationMillis / 1000 / 60;
+		long seconds = (durationMillis - (minutes * 60 * 1000)) / 1000;
+		
+		builder.append(minutes).append(':').append(seconds);
 	}
 
 	private String getColumnStringValue(Cursor cursor, String columnName)
@@ -202,17 +216,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				}
 				else
 				{		
-					Toast.makeText(
-						this, 
-						getResources().getString(R.string.info_alarm_enabled), 
-						Toast.LENGTH_SHORT
-					).show();
-					
-					allowChange = true;
-					
-					Intent innerIntent = new Intent(
-						android.content.Intent.ACTION_VIEW, 
-						songUri);
+					Intent innerIntent = new Intent(Intent.ACTION_VIEW, songUri);
 					
 					// required by PendingIntent.getActivity
 					innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -229,6 +233,9 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 						alarmTimestamp, 
 						AlarmManager.INTERVAL_DAY, 
 						lastAlarmIntent);
+					
+					allowChange = true;					
+					showToast(R.string.info_alarm_enabled);
 				}
 			} 
 			else
