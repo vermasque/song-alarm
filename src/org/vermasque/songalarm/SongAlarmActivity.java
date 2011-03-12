@@ -22,11 +22,15 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 {
 	private static final long NO_ALARM_TIME_SET = -1;
 	
+	private static final int RESULT_ID_SONG = 0;
+	
 	private Preference mAlarmTimePref, mAlarmEnabledPref;
 
 	private long alarmTimestamp;	
 	
 	private PendingIntent lastAlarmIntent;
+
+	private Preference mSongPref;
 	
 	public SongAlarmActivity()
 	{
@@ -45,9 +49,11 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 
 		mAlarmTimePref = findPreference("alarm_time");
 		mAlarmEnabledPref = findPreference("alarm_enabled");
+		mSongPref = findPreference("song");
 		
 		mAlarmTimePref.setOnPreferenceClickListener(this);		
 		mAlarmEnabledPref.setOnPreferenceChangeListener(this);
+		mSongPref.setOnPreferenceClickListener(this);
 	}
 	
 	@Override
@@ -66,10 +72,36 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			
 			return true;
 		}
+		else if (pref == mSongPref) {
+			Intent innerIntent = new Intent(android.content.Intent.ACTION_GET_CONTENT);
+			
+			innerIntent.setType("audio/*");
+			innerIntent.addCategory(Intent.CATEGORY_OPENABLE);
+			
+			startActivityForResult(Intent.createChooser(innerIntent, null), RESULT_ID_SONG);
+		}
 	
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.preference.PreferenceActivity#onActivityResult(int, int, android.content.Intent)
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent)
+	{
+		if (RESULT_OK == resultCode) {
+			switch (requestCode)
+			{
+			case RESULT_ID_SONG:
+				mSongPref.setSummary(resultIntent.getData().toString());
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
 	@Override
 	public void onTimeSet(TimePicker picker, int hourOfDay, int minutes)
 	{

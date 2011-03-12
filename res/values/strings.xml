@@ -7,4 +7,5 @@
     <string name="date_format_alarm_time">h:mm aa</string>
     <string name="error_no_alarm_set">Cannot turn on alarm: set the time!</string>
     <string name="info_alarm_enabled">Alarm is on!</string>
+    <string name="pref_title_song">Song</string>
 </resources>
