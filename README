@@ -1,0 +1,21 @@
+README - SONG ALARM
+
+Song Alarm is a simple application for Android for playing a song when an alarm
+fires at a set time.  The Android Open Source Project's AlarmClock application
+does not support this (not sure about DeskClock, its replacement).  There are
+non-free applications on the Market that have this feature, but I wouldn't buy
+an app just for this feature.
+
+Enjoy and wake up to your favorite song!  Songs can be downloaded from digital
+music stores like Amazon.
+
+PUBLICATION TO MARKET
+
+User vermasque will publish the first version in March 2011 under the name 
+"Song Alarm";  subsquent updates will be published by him until further notice.
+Updates will include bug fixes and UI improvements.
+
+CONTACT
+
+For questions and suggestions, contact vermasque via GitHub message or e-mail
+(see GitHub profile for address).
