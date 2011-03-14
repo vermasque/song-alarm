@@ -40,17 +40,21 @@ import android.widget.Toast;
 
 public class SongAlarmActivity extends PreferenceActivity implements OnPreferenceClickListener, OnTimeSetListener, OnPreferenceChangeListener
 {
+	public static final String PREF_SONG = "song";
+
+	public static final String PREF_ALARM_ENABLED = "alarm_enabled";
+
+	public static final String PREF_ALARM_TIME = "alarm_time";
+
 	private static final long NO_ALARM_TIME_SET = -1;
 	
 	private static final int RESULT_ID_SONG = 0;
 	
-	private Preference mAlarmTimePref, mAlarmEnabledPref;
+	private Preference mAlarmTimePref, mAlarmEnabledPref, mSongPref;
 
 	private long alarmTimestamp;	
 	
 	private PendingIntent lastAlarmIntent;
-
-	private Preference mSongPref;
 
 	private Uri songUri;
 	
@@ -70,9 +74,9 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		// Content view must have been set in superclass onCreate
 		addPreferencesFromResource(R.xml.preferences);
 
-		mAlarmTimePref = findPreference("alarm_time");
-		mAlarmEnabledPref = findPreference("alarm_enabled");
-		mSongPref = findPreference("song");
+		mAlarmTimePref = findPreference(PREF_ALARM_TIME);
+		mAlarmEnabledPref = findPreference(PREF_ALARM_ENABLED);
+		mSongPref = findPreference(PREF_SONG);
 		
 		mAlarmTimePref.setOnPreferenceClickListener(this);		
 		mAlarmEnabledPref.setOnPreferenceChangeListener(this);
