@@ -48,4 +48,9 @@ public class SongAlarmActivityTest extends
 		assertEquals(SUMMARY_DEFAULT, mAlarmTimePref.getSummary());
 		assertEquals(SUMMARY_DEFAULT, mSongPref.getSummary());
 	}
+	
+	public void testNoTimeSet()
+	{
+		fail("nyi");
+	}
 }
