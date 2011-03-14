@@ -5,6 +5,7 @@ import org.vermasque.songalarm.SongAlarmActivity;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.KeyEvent;
 
 public class SongAlarmActivityTest extends
 		ActivityInstrumentationTestCase2<SongAlarmActivity>
@@ -44,13 +45,25 @@ public class SongAlarmActivityTest extends
 			mActivity.getResources().getString(
 				org.vermasque.songalarm.R.string.pref_summary_default);
 		
+		assertFalse(mActivity.isAlarmEnabled());
 		assertFalse(mAlarmEnabledPref.isChecked());
 		assertEquals(SUMMARY_DEFAULT, mAlarmTimePref.getSummary());
 		assertEquals(SUMMARY_DEFAULT, mSongPref.getSummary());
 	}
 	
-	public void testNoTimeSet()
+	public void testNoInputsSet()
 	{
-		fail("nyi");
+		mActivity.runOnUiThread(new Runnable()
+		{		
+			@Override
+			public void run()
+			{
+				mAlarmEnabledPref.getView(null, null).requestFocus();
+			}
+		});
+		
+		sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
+		
+		assertFalse(mActivity.isAlarmEnabled());
 	}
 }

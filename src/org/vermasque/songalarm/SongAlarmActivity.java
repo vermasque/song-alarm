@@ -285,4 +285,9 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	{
 		return (AlarmManager)getSystemService(ALARM_SERVICE);
 	}
+
+	public boolean isAlarmEnabled()
+	{
+		return (null != lastAlarmIntent);
+	}
 }
