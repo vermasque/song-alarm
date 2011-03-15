@@ -4,5 +4,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/song-alarm"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/home/skv/downloads/robotium-solo-2.2.jar"/>
+	<classpathentry kind="lib" path="/home/skv/downloads/robotium-solo-2.2-javadoc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

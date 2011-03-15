@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World!</string>
     <string name="app_name">song-alarm-test</string>
+    <string name="date_time_set">Set</string>
 </resources>
