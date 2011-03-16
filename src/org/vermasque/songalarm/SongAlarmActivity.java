@@ -263,6 +263,11 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 					getResources().getString(R.string.date_format_alarm_time), 
 					cal)
 		);
+		
+		// re-enable alarm to match updated time
+		if (isAlarmEnabled()) {
+			enableAlarm();
+		}
 	}
 
 	@Override
@@ -286,28 +291,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				}
 				else
 				{		
-					Intent innerIntent = new Intent(Intent.ACTION_VIEW, songUri);
-					
-					// required by PendingIntent.getActivity
-					innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					
-					// if a previous intent was created, cancel it 
-					// to handle case of changed song
-					lastAlarmIntent = 
-						PendingIntent.getActivity(
-							this, 
-							0, 
-							innerIntent, 
-							PendingIntent.FLAG_CANCEL_CURRENT);
-					
-					getAlarmManager().setRepeating(
-						AlarmManager.RTC_WAKEUP, 
-						alarmTimestamp, 
-						AlarmManager.INTERVAL_DAY, 
-						lastAlarmIntent);
-					
-					allowChange = true;					
-					showToast(R.string.info_alarm_enabled);
+					enableAlarm();
+					allowChange = true;
 				}
 			} 
 			else
@@ -322,6 +307,31 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		}
 		
 		return allowChange;
+	}
+
+	private void enableAlarm()
+	{
+		Intent innerIntent = new Intent(Intent.ACTION_VIEW, songUri);
+		
+		// required by PendingIntent.getActivity
+		innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		// if a previous intent was created, cancel it 
+		// to handle case of changed song
+		lastAlarmIntent = 
+			PendingIntent.getActivity(
+				this, 
+				0, 
+				innerIntent, 
+				PendingIntent.FLAG_CANCEL_CURRENT);
+		
+		getAlarmManager().setRepeating(
+			AlarmManager.RTC_WAKEUP, 
+			alarmTimestamp, 
+			AlarmManager.INTERVAL_DAY, 
+			lastAlarmIntent);
+		
+		showToast(R.string.info_alarm_enabled);
 	}
 
 	private void showToast(int messageResourceId)
