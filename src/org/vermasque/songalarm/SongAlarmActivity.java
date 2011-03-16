@@ -20,6 +20,7 @@ package org.vermasque.songalarm;
 import java.util.Calendar;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -47,6 +48,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	private static final long NO_ALARM_TIME_SET = -1;
 	
 	private static final int RESULT_ID_SONG = 0;
+	
+	private static final int DIALOG_ID_ALARM_TIME = 0;
 	
 	private Preference mAlarmTimePref, mAlarmEnabledPref, mSongPref;
 
@@ -81,20 +84,37 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		mSongPref.setOnPreferenceClickListener(this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateDialog(int)
+	 */
 	@Override
-	public boolean onPreferenceClick(Preference pref)
+	protected Dialog onCreateDialog(int id)
 	{
-		if (pref == mAlarmTimePref) {
-			Resources res = getResources();
+		switch(id)
+		{
+		case DIALOG_ID_ALARM_TIME:
+		{
+			Resources res = getResources();	
 			
-			new TimePickerDialog(
+			return new TimePickerDialog(
 				this, // context 
 				this, // time set handler
 				res.getInteger(R.integer.default_hour), 
 				res.getInteger(R.integer.default_minutes), 
 				false // not 24-hr clock format
-			).show();
-			
+			);
+		}
+		default:
+			return null;
+		}
+	}
+
+	@Override
+	public boolean onPreferenceClick(Preference pref)
+	{
+		if (pref == mAlarmTimePref)
+		{
+			showDialog(DIALOG_ID_ALARM_TIME);	
 			return true;
 		}
 		else if (pref == mSongPref) {
@@ -103,7 +123,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			innerIntent.setType("audio/*");
 			innerIntent.addCategory(Intent.CATEGORY_OPENABLE);
 			
-			startActivityForResult(Intent.createChooser(innerIntent, null), RESULT_ID_SONG);
+			startActivityForResult(
+				Intent.createChooser(innerIntent, null), RESULT_ID_SONG);
 		}
 	
 		return false;
