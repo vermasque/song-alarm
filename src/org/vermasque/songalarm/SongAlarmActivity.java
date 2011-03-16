@@ -41,9 +41,7 @@ import android.widget.Toast;
 public class SongAlarmActivity extends PreferenceActivity implements OnPreferenceClickListener, OnTimeSetListener, OnPreferenceChangeListener
 {
 	public static final String PREF_SONG = "song";
-
 	public static final String PREF_ALARM_ENABLED = "alarm_enabled";
-
 	public static final String PREF_ALARM_TIME = "alarm_time";
 
 	private static final long NO_ALARM_TIME_SET = -1;
@@ -242,12 +240,14 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 					// required by PendingIntent.getActivity
 					innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
+					// if a previous intent was created, cancel it 
+					// to handle case of changed song
 					lastAlarmIntent = 
 						PendingIntent.getActivity(
 							this, 
 							0, 
 							innerIntent, 
-							PendingIntent.FLAG_UPDATE_CURRENT);
+							PendingIntent.FLAG_CANCEL_CURRENT);
 					
 					getAlarmManager().setRepeating(
 						AlarmManager.RTC_WAKEUP, 
@@ -262,6 +262,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			else
 			{
 				getAlarmManager().cancel(lastAlarmIntent);
+			
+				showToast(R.string.info_alarm_disabled);
 				
 				allowChange    = true;
 				songUri        = null;

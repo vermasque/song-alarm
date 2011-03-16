@@ -65,3 +65,4 @@ DEFER - post issues to Github after testing on real phone
 time zone change
 24-hr clock support
 logcat messages
+external storage state
