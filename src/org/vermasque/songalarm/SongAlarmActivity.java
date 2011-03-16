@@ -55,13 +55,16 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 
 	private long alarmTimestamp;	
 	
+	private AlarmTime alarmTime;
+	
 	private PendingIntent lastAlarmIntent;
-
+	
 	private Uri songUri;
 	
 	public SongAlarmActivity()
 	{
 		alarmTimestamp  = NO_ALARM_TIME_SET;
+		alarmTime       = null;
 		lastAlarmIntent = null;
 		songUri         = null;
 	}
@@ -106,6 +109,20 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		}
 		default:
 			return null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+	 */
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog)
+	{
+		if (DIALOG_ID_ALARM_TIME == id && null != alarmTime)
+		{
+			((TimePickerDialog)dialog).updateTime(
+				alarmTime.getHourOfDay(), alarmTime.getMinutes()
+			);
 		}
 	}
 
@@ -235,6 +252,12 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		
 		alarmTimestamp = cal.getTimeInMillis();
 		
+		if (null == alarmTime) {
+			alarmTime = new AlarmTime(hourOfDay, minutes);
+		} else {
+			alarmTime.updateTime(hourOfDay, minutes);
+		}
+		
 		mAlarmTimePref.setSummary(
 			DateFormat.format(
 					getResources().getString(R.string.date_format_alarm_time), 
@@ -294,7 +317,6 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				showToast(R.string.info_alarm_disabled);
 				
 				allowChange    = true;
-				songUri        = null;
 				alarmTimestamp = NO_ALARM_TIME_SET;
 			}
 		}
