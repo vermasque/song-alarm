@@ -1,0 +1,19 @@
+README - SONG ALARM ICONS
+
+These files were created with Inkscape.  Only their derivatives should be in
+the application package.
+
+song-alarm-512.svg 
+	Used to create the 512x512 image required by Android Market
+
+ic_launcher.svg
+	Used to create Launcher icons for different screen densities
+
+The PNG versions put into resources were created from these files using the 
+export feature in Inkscape:
+
+	File >> Export bitmap . . .
+
+Set the bitmap size to the appropriate size from the UI design guidelines for
+the screen density (ldpi, mdpi, etc.).  The x0 and y0 values should be 0.
+The x1 and y1 values should be width and height of the svg icon respectively.
