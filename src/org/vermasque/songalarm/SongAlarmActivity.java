@@ -175,7 +175,14 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		long minutes = durationMillis / 1000 / 60;
 		long seconds = (durationMillis - (minutes * 60 * 1000)) / 1000;
 		
-		builder.append(minutes).append(':').append(seconds);
+		builder.append(minutes).append(':');
+		
+		if (seconds < 10)
+		{
+			builder.append('0');
+		}
+		
+		builder.append(seconds);
 	}
 
 	private String getColumnStringValue(Cursor cursor, String columnName)
