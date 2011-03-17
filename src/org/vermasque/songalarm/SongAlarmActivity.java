@@ -107,6 +107,10 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 
 	private void updateTimeSummary()
 	{
+		if (null == alarmTime) {
+			return;
+		}
+		
 		Calendar cal = Calendar.getInstance();	
 		
 		// guarantee current time set to avoid side effects of previous calls to this function
@@ -140,6 +144,10 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 
 	private void updateSongSummary()
 	{
+		if (null == songUri) {
+			return;
+		}
+		
 		// assume external storage because audio files are not tied
 		// to a specific application and should be world-readable and exportable
 		Uri contentUri = Audio.Media.EXTERNAL_CONTENT_URI;
