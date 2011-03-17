@@ -19,6 +19,8 @@
 
 package org.vermasque.songalarm;
 
+import java.util.Calendar;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -39,7 +41,7 @@ public class AlarmTime implements Parcelable
 		}
     };
 	
-	private int hourOfDay, minutes;
+	private int mHourOfDay, mMinutes;
 
 	/**
 	 * @see AlarmTime#updateTime(int, int)
@@ -65,18 +67,18 @@ public class AlarmTime implements Parcelable
 	 */
 	public void updateTime(int hourOfDay, int minutes)
 	{
-		this.hourOfDay = hourOfDay;
-		this.minutes = minutes;
+		this.mHourOfDay = hourOfDay;
+		this.mMinutes = minutes;
 	}
 
 	public int getHourOfDay()
 	{
-		return hourOfDay;
+		return mHourOfDay;
 	}
 
 	public int getMinutes()
 	{
-		return minutes;
+		return mMinutes;
 	}
 
 	@Override
@@ -88,8 +90,31 @@ public class AlarmTime implements Parcelable
 	@Override
 	public void writeToParcel(Parcel dest, int flags) // flags ignored
 	{
-		dest.writeInt(hourOfDay);
-		dest.writeInt(minutes);
+		dest.writeInt(mHourOfDay);
+		dest.writeInt(mMinutes);
 	}
 	
+	public long toTimestamp()
+	{
+		Calendar cal = Calendar.getInstance();	
+		
+		// guarantee current time set to avoid side effects of previous calls to this function
+		cal.setTimeInMillis(System.currentTimeMillis()); 
+		
+		int currentHourOfDay = cal.get(Calendar.HOUR_OF_DAY), 
+			currentMinutes = cal.get(Calendar.MINUTE);
+		
+		if (mHourOfDay < currentHourOfDay || 
+			(currentHourOfDay == mHourOfDay && mMinutes <= currentMinutes)) 
+		{
+			cal.add(Calendar.DAY_OF_YEAR, 1);
+		}
+		
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.SECOND,      0);
+		cal.set(Calendar.HOUR_OF_DAY, mHourOfDay);
+		cal.set(Calendar.MINUTE,      mMinutes);
+		
+		return cal.getTimeInMillis();
+	}
 }

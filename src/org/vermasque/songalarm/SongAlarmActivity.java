@@ -46,16 +46,12 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	public static final String PREF_SONG = "song";
 	public static final String PREF_ALARM_ENABLED = "alarm_enabled";
 	public static final String PREF_ALARM_TIME = "alarm_time";
-
-	private static final long NO_ALARM_TIME_SET = -1;
 	
 	private static final int RESULT_ID_SONG = 0;
 	
 	private static final int DIALOG_ID_ALARM_TIME = 0;
 	
-	private Preference mAlarmTimePref, mAlarmEnabledPref, mSongPref;
-
-	private long alarmTimestamp;	
+	private Preference mAlarmTimePref, mAlarmEnabledPref, mSongPref;	
 	
 	private AlarmTime alarmTime;
 	
@@ -65,7 +61,6 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	
 	public SongAlarmActivity()
 	{
-		alarmTimestamp  = NO_ALARM_TIME_SET;
 		alarmTime       = null;
 		lastAlarmIntent = null;
 		songUri         = null;
@@ -113,27 +108,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		
 		Calendar cal = Calendar.getInstance();	
 		
-		// guarantee current time set to avoid side effects of previous calls to this function
-		cal.setTimeInMillis(System.currentTimeMillis()); 
-		
-		int currentHourOfDay = cal.get(Calendar.HOUR_OF_DAY), 
-			currentMinutes = cal.get(Calendar.MINUTE);
-		
-		int hourOfDay = alarmTime.getHourOfDay(),
-			minutes = alarmTime.getMinutes();
-		
-		if (currentHourOfDay > hourOfDay || 
-			(currentHourOfDay == hourOfDay && currentMinutes > minutes)) 
-		{
-			cal.add(Calendar.DAY_OF_YEAR, 1);
-		}
-		
-		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.SECOND,      0);
-		cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-		cal.set(Calendar.MINUTE,      minutes);
-		
-		alarmTimestamp = cal.getTimeInMillis();
+		cal.setTimeInMillis(alarmTime.toTimestamp());
 		
 		mAlarmTimePref.setSummary(
 			DateFormat.format(
@@ -333,7 +308,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			
 			if (enableAlarm) 
 			{
-				if (NO_ALARM_TIME_SET == alarmTimestamp)
+				if (null == alarmTime)
 				{
 					showToast(R.string.error_no_time_set);
 				} 
@@ -379,7 +354,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		
 		getAlarmManager().setRepeating(
 			AlarmManager.RTC_WAKEUP, 
-			alarmTimestamp, 
+			alarmTime.toTimestamp(), 
 			AlarmManager.INTERVAL_DAY, 
 			lastAlarmIntent);
 		
