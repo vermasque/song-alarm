@@ -88,6 +88,114 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	}
 	
 	/* (non-Javadoc)
+	 * @see android.preference.PreferenceActivity#onRestoreInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onRestoreInstanceState(Bundle state)
+	{
+		super.onRestoreInstanceState(state);
+		
+		lastAlarmIntent = state.getParcelable(PREF_ALARM_ENABLED);
+		songUri = state.getParcelable(PREF_SONG);
+		alarmTime = state.getParcelable(PREF_ALARM_TIME);
+		
+		updateSongSummary();
+		updateTimeSummary();
+	}
+
+	private void updateTimeSummary()
+	{
+		Calendar cal = Calendar.getInstance();	
+		
+		// guarantee current time set to avoid side effects of previous calls to this function
+		cal.setTimeInMillis(System.currentTimeMillis()); 
+		
+		int currentHourOfDay = cal.get(Calendar.HOUR_OF_DAY), 
+			currentMinutes = cal.get(Calendar.MINUTE);
+		
+		int hourOfDay = alarmTime.getHourOfDay(),
+			minutes = alarmTime.getMinutes();
+		
+		if (currentHourOfDay > hourOfDay || 
+			(currentHourOfDay == hourOfDay && currentMinutes > minutes)) 
+		{
+			cal.add(Calendar.DAY_OF_YEAR, 1);
+		}
+		
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.SECOND,      0);
+		cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		cal.set(Calendar.MINUTE,      minutes);
+		
+		alarmTimestamp = cal.getTimeInMillis();
+		
+		mAlarmTimePref.setSummary(
+			DateFormat.format(
+					getResources().getString(R.string.date_format_alarm_time), 
+					cal)
+		);		
+	}
+
+	private void updateSongSummary()
+	{
+		// assume external storage because audio files are not tied
+		// to a specific application and should be world-readable and exportable
+		Uri contentUri = Audio.Media.EXTERNAL_CONTENT_URI;
+						
+		String[] columns = {
+			Audio.AudioColumns.ARTIST,   Audio.AudioColumns.ALBUM, 
+			Audio.AudioColumns.DURATION, Audio.AudioColumns.TITLE
+		};
+		
+		String whereClause = BaseColumns._ID + "=?";
+		
+		String[] selectArgs = {songUri.getLastPathSegment()}; //{"LIMIT 1"}; ?
+		
+		Cursor cursor = managedQuery(contentUri, columns, whereClause, selectArgs, null);
+					
+		if (cursor.moveToFirst()) {
+			
+			String artist, album, title;
+			long duration;
+			
+			try {
+				artist = getColumnStringValue(cursor, Audio.AudioColumns.ARTIST);
+				album  = getColumnStringValue(cursor, Audio.AudioColumns.ALBUM);
+				title  = getColumnStringValue(cursor, Audio.AudioColumns.TITLE);
+			
+				duration = cursor.getLong(
+					cursor.getColumnIndexOrThrow(Audio.AudioColumns.DURATION));
+			
+				StringBuilder builder = new StringBuilder();
+		
+				builder.append(title).append('\n');
+				builder.append(artist).append('\n');
+				builder.append(album).append('\n');
+				
+				addMinSecString(builder, duration);	
+				
+				mSongPref.setSummary(builder.toString());
+			}
+			catch(IllegalArgumentException e) {
+				Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.preference.PreferenceActivity#onSaveInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		
+		outState.putParcelable(PREF_ALARM_ENABLED, lastAlarmIntent);
+		outState.putParcelable(PREF_SONG, songUri);
+		outState.putParcelable(PREF_ALARM_TIME, alarmTime);
+	}
+
+	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateDialog(int)
 	 */
 	@Override
@@ -159,48 +267,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			case RESULT_ID_SONG:
 				songUri = resultIntent.getData();
 								
-				// assume external storage because audio files are not tied
-				// to a specific application and should be world-readable and exportable
-				Uri contentUri = Audio.Media.EXTERNAL_CONTENT_URI;
-								
-				String[] columns = {
-					Audio.AudioColumns.ARTIST,   Audio.AudioColumns.ALBUM, 
-					Audio.AudioColumns.DURATION, Audio.AudioColumns.TITLE
-				};
-				
-				String whereClause = BaseColumns._ID + "=?";
-				
-				String[] selectArgs = {songUri.getLastPathSegment()}; //{"LIMIT 1"}; ?
-				
-				Cursor cursor = managedQuery(contentUri, columns, whereClause, selectArgs, null);
-							
-				if (cursor.moveToFirst()) {
-					
-					String artist, album, title;
-					long duration;
-					
-					try {
-						artist = getColumnStringValue(cursor, Audio.AudioColumns.ARTIST);
-						album  = getColumnStringValue(cursor, Audio.AudioColumns.ALBUM);
-						title  = getColumnStringValue(cursor, Audio.AudioColumns.TITLE);
-					
-						duration = cursor.getLong(cursor.getColumnIndexOrThrow(Audio.AudioColumns.DURATION));
-					
-						StringBuilder builder = new StringBuilder();
-				
-						builder.append(title).append('\n');
-						builder.append(artist).append('\n');
-						builder.append(album).append('\n');
-						
-						addMinSecString(builder, duration);	
-						
-						mSongPref.setSummary(builder.toString());
-					}
-					catch(IllegalArgumentException e) {
-						Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-					}
-				}
-				
+				updateSongSummary();
 				break;
 			default:
 				break;
@@ -231,38 +298,13 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 	@Override
 	public void onTimeSet(TimePicker picker, int hourOfDay, int minutes)
 	{
-		Calendar cal = Calendar.getInstance();
-		
-		// guarantee current time set to avoid side effects of previous calls to this function
-		cal.setTimeInMillis(System.currentTimeMillis()); 
-		
-		int currentHourOfDay = cal.get(Calendar.HOUR_OF_DAY), 
-			currentMinutes = cal.get(Calendar.MINUTE);
-		
-		if (currentHourOfDay > hourOfDay || 
-			(currentHourOfDay == hourOfDay && currentMinutes > minutes)) 
-		{
-			cal.add(Calendar.DAY_OF_YEAR, 1);
-		}
-		
-		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.SECOND,      0);
-		cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-		cal.set(Calendar.MINUTE,      minutes);
-		
-		alarmTimestamp = cal.getTimeInMillis();
-		
 		if (null == alarmTime) {
 			alarmTime = new AlarmTime(hourOfDay, minutes);
 		} else {
 			alarmTime.updateTime(hourOfDay, minutes);
 		}
 		
-		mAlarmTimePref.setSummary(
-			DateFormat.format(
-					getResources().getString(R.string.date_format_alarm_time), 
-					cal)
-		);
+		updateTimeSummary();
 		
 		// re-enable alarm to match updated time
 		if (isAlarmEnabled()) {
@@ -303,6 +345,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				
 				allowChange    = true;
 				alarmTimestamp = NO_ALARM_TIME_SET;
+				lastAlarmIntent = null;
 			}
 		}
 		

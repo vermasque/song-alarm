@@ -60,6 +60,11 @@ change time
 	wait for a minute
 	assert like done in successful case			
 
+state transition (actual)
+	enable the alarm for arbitrary song and time one minute from now
+	restart activity
+	alarm should go	off but the application wouldn't indicate that expectation 
+
 DEFER - post issues to Github after testing on real phone
 
 time zone change
