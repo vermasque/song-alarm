@@ -235,6 +235,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			
 			startActivityForResult(
 				Intent.createChooser(innerIntent, null), RESULT_ID_SONG);
+			
+			return true;
 		}
 	
 		return false;
