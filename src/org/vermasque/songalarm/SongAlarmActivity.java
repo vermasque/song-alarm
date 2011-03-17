@@ -353,8 +353,7 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			
 				showToast(R.string.info_alarm_disabled);
 				
-				allowChange    = true;
-				alarmTimestamp = NO_ALARM_TIME_SET;
+				allowChange     = true;
 				lastAlarmIntent = null;
 			}
 		}
