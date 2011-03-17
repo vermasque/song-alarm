@@ -1,7 +1,6 @@
 preconditions
-	preferences set to defaults
+	preferences set to defaults (none, press to select)
 	alarm enable box not checked
-	alarm is not enabled
 	open time dialog
 		should have defaults set	
 	click cancel button
@@ -18,8 +17,7 @@ song not set
 time not set
 	set song
 		click on song preference
-		click music picker
-		click Africa Land
+		click any track from any source
 		click ok
 	try to enable alarm
 
@@ -27,26 +25,11 @@ successful case
 	set time
 	set song
 	enable alarm for a minute from now
-	sleep for a minute + a delay to avoid race condition
-	check that music player has focus?
-		or that song alarm is not in focus?
 	check that alarm is still enabled (repeats by default)
 
 song duration string formatting
 	test double digit minute and second
 	test single digit minute and second
-
-state transitions
-	create activity
-	set time to some time from now 
-	set song
-	enable alarm 
-	wipe out summaries in preferences
-	uncheck alarm enable preference	
-	destroy activity		
-	create activity
-	compare previous summaries to latest 
-	compare alarm enabled state 
 
 change time
 	set song 
@@ -54,16 +37,23 @@ change time
 	open dialog to set time
 		check that time in dialog matches previously previously set time
 		change time to 3 minutes from now
-	click alarm enable preference
-	assert that alarm is enabled
+	enable alarm
+	assert alarm is on
 	change time to one minute from now
-	wait for a minute
-	assert like done in successful case			
+	assert alarm is on
+	assert alarm goes off in the next minute
 
-state transition (actual)
+state transition (use package browser in emulator to restart activity)
 	enable the alarm for arbitrary song and time one minute from now
 	restart activity
-	alarm should go	off but the application wouldn't indicate that expectation 
+	should see all song and alarm time as previously set
+	alarm should go	off 
+
+day before test
+	set valid song
+	set time to one minute before now
+	enable alarm
+	alarm should be on but not play song immediately
 
 DEFER - post issues to Github after testing on real phone
 
