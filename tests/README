@@ -54,10 +54,3 @@ day before test
 	set time to one minute before now
 	enable alarm
 	alarm should be on but not play song immediately
-
-DEFER - post issues to Github after testing on real phone
-
-time zone change
-24-hr clock support
-logcat messages
-external storage state
