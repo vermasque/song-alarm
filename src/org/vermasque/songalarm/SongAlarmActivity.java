@@ -253,13 +253,30 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			{
 			case RESULT_ID_SONG:
 				songUri = resultIntent.getData();
-								
+						
+				if (isAlarmEnabled()) {
+					updateAlarm();
+				}
+				
 				updateSongSummary();
 				break;
 			default:
 				break;
 			}
 		}
+	}
+
+	private void updateAlarm()
+	{
+		disableAlarm();
+		enableAlarm();
+		showToast(R.string.info_alarm_updated);
+	}
+
+	private void disableAlarm()
+	{
+		getAlarmManager().cancel(lastAlarmIntent);
+		lastAlarmIntent = null;
 	}
 
 	private void addMinSecString(StringBuilder builder, long durationMillis)
@@ -291,12 +308,11 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			alarmTime.updateTime(hourOfDay, minutes);
 		}
 		
-		updateTimeSummary();
-		
-		// re-enable alarm to match updated time
 		if (isAlarmEnabled()) {
-			enableAlarm();
+			updateAlarm();
 		}
+		
+		updateTimeSummary();
 	}
 
 	@Override
@@ -321,17 +337,16 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 				else
 				{		
 					enableAlarm();
+					showToast(R.string.info_alarm_enabled);
 					allowChange = true;
 				}
 			} 
 			else
 			{
-				getAlarmManager().cancel(lastAlarmIntent);
-			
+				disableAlarm();			
 				showToast(R.string.info_alarm_disabled);
-				
-				allowChange     = true;
-				lastAlarmIntent = null;
+				allowChange = true;
+
 			}
 		}
 		
@@ -345,8 +360,8 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		// required by PendingIntent.getActivity
 		innerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		// if a previous intent was created, cancel it 
-		// to handle case of changed song
+		// if a previous intent was created that matches this one,
+		// cancel it just to start fresh 
 		lastAlarmIntent = 
 			PendingIntent.getActivity(
 				this, 
@@ -359,8 +374,6 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 			alarmTime.toTimestamp(), 
 			AlarmManager.INTERVAL_DAY, 
 			lastAlarmIntent);
-		
-		showToast(R.string.info_alarm_enabled);
 	}
 
 	private void showToast(int messageResourceId)

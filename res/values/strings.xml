@@ -8,6 +8,7 @@
     <string name="error_no_time_set">Cannot turn on alarm: set the time!</string>
     <string name="info_alarm_enabled">Alarm is on!</string>
  	<string name="info_alarm_disabled">Alarm is off!</string>
+ 	<string name="info_alarm_updated">Alarm updated!</string>
     <string name="pref_title_song">Song</string>
     <string name="error_no_song_set">Cannot turn on the alarm:  pick a song!</string>
 </resources>
