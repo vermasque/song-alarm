@@ -1,3 +1,10 @@
+TEST CASES
+As existing open source testing frameworks don't support multi-application 
+multi-activity testing, just manually execute a bunch of test cases on the
+emulator or hardware device.
+
+CORE TESTS
+
 preconditions
 	preferences set to defaults (none, press to select)
 	alarm enable box not checked
@@ -21,36 +28,57 @@ time not set
 		click ok
 	try to enable alarm
 
-successful case
-	set time
+successful case 1
+	set time to 5 minutes from now
+	open dialog to set time
+		check that time in dialog matches previously previously set time
+	change time to 3 minutes from now
 	set song
-	enable alarm for a minute from now
+	change time to 1 minute from now
+	enable alarm
+	wait for alarm to go off
 	check that alarm is still enabled (repeats by default)
+	disable alarm
+	change system time to one minute before previous alarm time
+	wait to make sure alarm does not go off 
+
+successful case 2
+	set song
+	change song
+	set time for a minute from now
+	change song
+	enable alarm
+	wait for alarm to go off
+	check that alarm is still enabled (repeats by default)
+
+change song and time
+	set a song
+	set a time
+	enable alarm
+	change the song
+	change the time
+    alarm should not fire at first time
+    alarm should fire at second time with second song
+
+LOWER LEVEL TESTS
+
+state transition 
+	enable the alarm for arbitrary song and time one minute from now
+	restart activity (use package browser in emulator to restart activity OR rotate phone when using real hardware)
+	should see all song and alarm time as previously set
+	alarm should go	off 
 
 song duration string formatting
 	test double digit minute and second
 	test single digit minute and second
 
-change time
-	set song 
-	set time to 5 minutes from now
-	open dialog to set time
-		check that time in dialog matches previously previously set time
-		change time to 3 minutes from now
-	enable alarm
-	assert alarm is on
-	change time to one minute from now
-	assert alarm is on
-	assert alarm goes off in the next minute
-
-state transition (use package browser in emulator to restart activity)
-	enable the alarm for arbitrary song and time one minute from now
-	restart activity
-	should see all song and alarm time as previously set
-	alarm should go	off 
-
 day before test
-	set valid song
-	set time to one minute before now
+	set song
+	set time to one minute BEFORE now
 	enable alarm
-	alarm should be on but not play song immediately
+	alarm should be on but not playing song
+	using Settings >> Date & time
+		change system time to one minute before song alarm time
+		change system date to tomorrow
+	wait a minute	
+	song should start playing
