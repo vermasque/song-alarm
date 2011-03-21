@@ -41,7 +41,7 @@ $ANDROID_DIR/tools/mksdcard $IMAGE_SIZE $IMAGE_PATH
 
 exit_on_error 'mksdcard failure'
 
-sudo mkdir $MOUNT_PATH
+sudo mkdir -p $MOUNT_PATH
 
 exit_on_error 'failed to make mount path'
 
