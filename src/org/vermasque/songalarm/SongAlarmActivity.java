@@ -190,14 +190,20 @@ public class SongAlarmActivity extends PreferenceActivity implements OnPreferenc
 		{
 		case DIALOG_ID_ALARM_TIME:
 		{
-			Resources res = getResources();	
+			Resources res = getResources();
+			boolean bIs24Hour = false;
+			
+			if (DateFormat.is24HourFormat(this))
+			{
+				bIs24Hour = true;
+			}
 			
 			return new TimePickerDialog(
 				this, // context 
 				this, // time set handler
 				res.getInteger(R.integer.default_hour), 
 				res.getInteger(R.integer.default_minutes), 
-				false // not 24-hr clock format
+				bIs24Hour // not 24-hr clock format
 			);
 		}
 		default:
